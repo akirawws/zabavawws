@@ -1,0 +1,575 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Zabavawws</title>
+  <!-- Подключение шрифтов (например, Bebas Neue с Google Fonts) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="avatar.png">
+  <!-- Подключение Font Awesome для иконок соцсетей -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" 
+        integrity="sha512-pIVpXqlHsT5tb8cUy7+Zc/t+mzoP6ObQwoIv2DQ9RxJcUSF5LgLCW1V3O2Xy8hvGmR0W8sL2c4SJDkL3z0G8iw==" 
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    /* Сброс стилей */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      height: 100%;
+      font-family: 'Bebas Neue', cursive;
+      color: #fff;
+      background-color: #111;
+      /* Запрещаем скроллинг */
+      overflow: hidden;
+    }
+    /* Общий стиль для видеофонов */
+    .video-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+    }
+
+    #enter-text {
+  font-size: 3.5em;
+  color: #ff0000; /* Красный цвет */
+  font-family: 'Bebas Neue', sans-serif; /* Красивый шрифт */
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  text-shadow: 2px 2px 10px rgba(255, 0, 0, 0.8);
+}
+
+#enter-text:hover {
+  transform: scale(1.1);
+  opacity: 0.8;
+}
+
+    /* Заставка */
+    #splash {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      z-index: 1000;
+      transition: opacity 1s ease;
+    }
+    #splash.fade-out {
+      opacity: 0;
+      visibility: hidden;
+    }
+    #splash button {
+      padding: 1em 2em;
+      font-size: 1.5em;
+      border: none;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+    #splash button:hover {
+      background-color: #8b0000;
+      transform: scale(1.05);
+    }
+    /* Основной контент */
+    #main-content {
+      display: none;
+      position: relative;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      animation: fadeIn 1s ease forwards;
+    }
+    /* Overlay для улучшения читаемости текста */
+    #main-content::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 1;
+    }
+    /* Контейнер для контента */
+    .content-wrapper {
+      position: relative;
+      z-index: 2;
+      /* Занимает весь viewport без скроллинга */
+      height: 100vh;
+      padding: 2em;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      justify-content: space-between;
+    }
+    /* Плавная анимация появления */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    /* Кнопка управления музыкой */
+    .music-toggle {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 1100;
+      background-color: rgba(0, 0, 0, 0.7);
+      border: none;
+      color: #fff;
+      padding: 0.5em 1em;
+      cursor: pointer;
+      font-size: 1em;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+    .music-toggle:hover {
+      background-color: #8b0000;
+    }
+/* 1. Центральная карточка */
+.central-card {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  height: 600px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.7); /* Полупрозрачный фон для нижней части */
+  margin-top: 8em;
+  margin-bottom: 2em;
+}
+
+/* 2. Баннер (GIF) */
+.card-banner {
+  width: 100%;
+  height: 50%; /* 50% высоты карточки (200px) */
+  overflow: hidden;
+  position: relative;
+}
+
+.card-banner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* 3. Контент карточки (под баннером) */
+.central-content {
+  position: relative;
+  height: 50%; /* Нижняя половина карточки */
+  background: rgba(0, 0, 0, 0.7); /* Полупрозрачность */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 4. Аватар: половина на баннере, половина в карточке */
+.central-avatar {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 4px solid #ff4500;
+  position: absolute;
+  top: 10px; /* 50% высоты баннера (200px), но аватар смещён вверх */
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #000;
+  z-index: 2;
+}
+
+/* 5. Никнейм */
+.central-content h1 {
+  font-size: 2.5em;
+  color: #ff4500;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+  margin-top: 80px; /* Отступ вниз от аватара */
+}
+
+/* 6. Описание (анимация печати) */
+.central-content .typewriter {
+  font-size: 1.5em;
+  color: #ff4500;
+  white-space: nowrap;
+  overflow: hidden;
+  border-right: 0.15em solid #ff4500;
+}
+
+/* 7. Контейнер для иконок */
+.central-socials {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+/* 7. Контейнер для иконок */
+.central-socials {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+/* 8. Стили для иконок */
+.central-socials a {
+  display: inline-block;
+  width: 25px;
+  height: 25px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.central-socials a img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: brightness(0) saturate(100%) invert(43%) sepia(91%) saturate(4191%) hue-rotate(356deg) brightness(99%) contrast(104%); /* Оранжевый цвет */
+}
+
+/* Эффект при наведении */
+.central-socials a:hover {
+  transform: scale(1.2);
+  opacity: 0.8;
+}
+
+/* Поднимаем текст вверх, чтобы не сливалось */
+.central-content h1 {
+  margin-top: 40px;
+}
+
+.central-content .typewriter {
+  margin-bottom: 10px;
+}
+
+
+
+
+    /* 2. Две горизонтальные карточки */
+    .horizontal-cards {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+      max-width: 1200px;
+      margin-bottom: 1em;
+    }
+    /* Увеличиваем ширину горизонтальных карточек до 350px */
+    .small-card {
+      background-color: rgba(0,0,0,0.7);
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.3s ease, border 0.3s ease;
+      border: 2px solid transparent;
+      /* Горизонтальное расположение элементов */
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      padding: 10px;
+      height: 150px;
+      width: 390px;
+    }
+    .small-card:hover {
+      transform: scale(1.02);
+      border-color: #ff4500;
+    }
+    .small-card img {
+      width: 60px; 
+      height: 60px;
+      object-fit: contain;
+      /* Применяем фильтр для придания оранжевого оттенка */
+      filter: brightness(0) saturate(100%) invert(43%) sepia(91%) saturate(4191%) hue-rotate(356deg) brightness(99%) contrast(104%);
+      flex-shrink: 0;
+    }
+    .small-card .card-content {
+      margin-left: 15px;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      width: 100%;
+    }
+    .small-card h3 {
+      font-size: 1.5em;
+      color: #da70d6;
+      margin-bottom: 5px;
+    }
+    .small-card .link-text {
+      font-size: 1em;
+      color: #ff4500;
+      text-decoration: underline;
+    }
+    /* 3. Карточка с "Add Discord" */
+    .discord-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: rgba(0,0,0,0.7);
+      border-radius: 8px;
+      overflow: hidden;
+      padding: 15px;
+      width: 100%;
+      max-width: 800px;
+      cursor: pointer;
+      transition: transform 0.3s ease, border 0.3s ease;
+      border: 2px solid transparent;
+      margin-bottom: 0.5em;
+    }
+    .discord-card:hover {
+      transform: scale(1.02);
+      border-color: #ff4500;
+    }
+    .discord-content {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .discord-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: 2px solid #ff4500;
+    }
+    .discord-content span {
+      font-size: 1.2em;
+      color: #ff4500;
+    }
+    .discord-btn {
+      background-color: #ff4500;
+      color: #fff;
+      padding: 10px 15px;
+      border-radius: 5px;
+      text-decoration: none;
+      transition: background-color 0.3s ease;
+      font-size: 1em;
+    }
+    .discord-btn:hover {
+      background-color: #da70d6;
+    }
+    /* Сохранённая профильная карточка (не изменяем логику) */
+    .profile-card {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2em;
+      border-radius: 10px;
+      backdrop-filter: blur(5px);
+      max-width: 350px;
+      width: 90%;
+      margin-bottom: 1em;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .profile-card img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 4px solid #8b0000;
+      margin-bottom: 1em;
+    }
+    .profile-card h2 {
+      font-size: 2em;
+      margin-bottom: 0.5em;
+    }
+    .social-icons {
+      display: flex;
+      gap: 1em;
+      margin-top: 1em;
+    }
+    .social-icons a {
+      color: #fff;
+      font-size: 1.5em;
+      transition: transform 0.3s ease, color 0.3s ease;
+    }
+    .social-icons a:hover {
+      transform: translateY(-5px);
+      color: #8b0000;
+    }
+  </style>
+</head>
+<body>
+  <!-- Заставка -->
+  <div id="splash">
+    <video class="video-bg" id="splash-video" autoplay loop muted playsinline>
+      <source src="background_first.mp4" type="video/mp4">
+    </video>
+    <p id="enter-text">click anyway</p>
+    <audio id="bg-music" src="background.mp4" loop></audio>
+  </div>
+
+  <!-- Основной контент -->
+  <div id="main-content">
+    <!-- Видео фон для основного контента -->
+    <video class="video-bg" id="main-video" autoplay loop muted playsinline>
+      <source src="background.mp4" type="video/mp4">
+      Ваш браузер не поддерживает воспроизведение видео.
+    </video>
+    <!-- Кнопка управления музыкой -->
+    <button class="music-toggle" id="music-toggle">Выключить музыку</button>
+    <div class="content-wrapper">
+      <!-- 1. Первая центральная карточка с баннером, аватаром, ником и typewriter эффектом -->
+      <section class="central-card">
+        <!-- HTML-баннер, который занимает верхнюю часть карточки -->
+        <div class="card-banner">
+          <img src="banner.gif" alt="Banner">
+        </div>
+        <!-- Контент, где аватар наполовину заезжает на баннер -->
+        <div class="central-content">
+          <img src="avatar.jpg" alt="Central Avatar" class="central-avatar">
+          <h1>Zabavawws</h1>
+          <div class="typewriter" id="central-typewriter"></div>
+<!-- Контейнер с иконками соцсетей -->
+<div class="central-socials">
+  <a href="https://discord.com/users/583275677411704851" target="_blank" title="Discord">
+    <img src="icondiscord.png" alt="Discord">
+  </a>
+  <a href="https://www.tiktok.com/@zabavawws" target="_blank" title="Telegram">
+    <img src="icontiktok.png" alt="Tiktok">
+  </a>
+  <a href="https://www.twitch.tv/zabavawws" target="_blank" title="GitHub">
+    <img src="icontwitch.png" alt="Twitch">
+  </a>
+</div>
+
+        </div>
+      </section>
+      <!-- 2. Две горизонтальные карточки -->
+      <section class="horizontal-cards">
+        <div class="small-card" onclick="navigateToLink('https://discord.gg/YAdcv84a4n')">
+          <img src="icondiscord.png" alt="Icon 1">
+          <div class="card-content">
+            <h3>Discord Server</h3>
+            <p class="link-text">discord.gg/kitsune</p>
+          </div>
+        </div>
+        <div class="small-card" onclick="navigateToLink('https://t.me/zabavawws')">
+          <img src="icontelegram.png" alt="Icon 2">
+          <div class="card-content">
+            <h3>Telegram Channel</h3>
+            <p class="link-text">t.me/zabavawws</p>
+          </div>
+        </div>
+      </section>
+      <!-- 3. Карточка с "Add Discord" -->
+      <section class="discord-card" onclick="navigateToLink('https://discord.gg/...')">
+        <div class="discord-content">
+          <img src="avatar.jpg" alt="Discord Avatar" class="discord-avatar">
+          <span>@zabavawws</span>
+        </div>
+        <a class="discord-btn" href="https://discord.com/users/583275677411704851" target="_blank">Add on Discord &rarr;</a>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    // Сохраненная логика для заставки и музыки
+    const splash = document.getElementById('splash');
+    const mainContent = document.getElementById('main-content');
+    const enterBtn = document.getElementById('enter-btn');
+    const bgMusic = document.getElementById('bg-music');
+    const musicToggle = document.getElementById('music-toggle');
+
+    // Устанавливаем начальную громкость
+    bgMusic.volume = 0;
+    function fadeInAudio(audioElement, targetVolume, duration) {
+      const initialVolume = audioElement.volume;
+      const steps = 20;
+      const stepTime = duration / steps;
+      const volumeIncrement = (targetVolume - initialVolume) / steps;
+      let currentStep = 0;
+      const fadeInterval = setInterval(() => {
+        currentStep++;
+        let newVolume = audioElement.volume + volumeIncrement;
+        if (newVolume >= targetVolume || currentStep >= steps) {
+          audioElement.volume = targetVolume;
+          clearInterval(fadeInterval);
+        } else {
+          audioElement.volume = newVolume;
+        }
+      }, stepTime);
+    }
+
+    splash.addEventListener('click', () => {
+    splash.classList.add('fade-out');
+    setTimeout(() => {
+        splash.style.display = 'none';
+        mainContent.style.display = 'block';
+        bgMusic.play().then(() => {
+            fadeInAudio(bgMusic, 0.6, 1000);
+        }).catch(err => console.log('Playback prevented:', err));
+    }, 1000);
+});
+
+// Управление музыкой
+musicToggle.addEventListener('click', () => {
+    if (bgMusic.paused) {
+        bgMusic.play().then(() => {
+            fadeInAudio(bgMusic, 0.6, 1000);
+        }).catch(err => console.log('Playback prevented:', err));
+        musicToggle.textContent = 'Выключить музыку';
+    } else {
+        bgMusic.pause();
+        musicToggle.textContent = 'Включить музыку';
+    }
+});
+
+    // Функция для перехода по ссылке при клике на карточку
+    function navigateToLink(url) {
+      window.location.href = url;
+    }
+
+    // Typewriter эффект для центральной карточки
+    const centralTypewriterElement = document.getElementById('central-typewriter');
+    const centralText = "description";
+    let centralIndex = 0;
+    let centralDeleting = false;
+    const centralTypingSpeed = 100;
+    const centralDeletingSpeed = 50;
+    const centralPauseAfterTyping = 2000;
+    const centralPauseAfterDeleting = 2000;
+
+    function typeCentral() {
+      if (!centralDeleting) {
+        centralTypewriterElement.textContent = centralText.substring(0, centralIndex);
+        centralIndex++;
+        if (centralIndex > centralText.length) {
+          setTimeout(() => {
+            centralDeleting = true;
+            typeCentral();
+          }, centralPauseAfterTyping);
+          return;
+        }
+        setTimeout(typeCentral, centralTypingSpeed);
+      } else {
+        centralTypewriterElement.textContent = centralText.substring(0, centralIndex);
+        centralIndex--;
+        if (centralIndex < 0) {
+          centralDeleting = false;
+          centralIndex = 0;
+          setTimeout(typeCentral, centralPauseAfterDeleting);
+          return;
+        }
+        setTimeout(typeCentral, centralDeletingSpeed);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      typeCentral();
+    });
+  </script>
+</body>
+</html>
